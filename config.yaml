@@ -1,0 +1,35 @@
+receivers:
+  windowseventlog/sysmon:
+    channel: Microsoft-Windows-Sysmon/Operational
+    raw: true
+  windowseventlog/security:
+    channel: security
+    raw: true
+  windowseventlog/application:
+    channel: application
+    raw: true
+  windowseventlog/system:
+    channel: system
+    raw: true
+
+processors:
+  batch:
+
+exporters:
+  chronicle/winevtlog:
+    endpoint: malachiteingestion-pa.googleapis.com
+    creds: '<---INSERT-CRED-HERE-->'
+    log_type: 'WINEVTLOG'
+    override_log_type: false
+    raw_log_field: body
+    customer_id: 'dddddddd-dddd-dddd-dddd-dddddddddddd'
+
+service:
+  pipelines:
+    logs/winevtlog:
+      receivers: 
+        - windowseventlog/security
+        - windowseventlog/application
+        - windowseventlog/system
+      processors: [batch]
+      exporters: [chronicle/winevtlog]
